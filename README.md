@@ -71,3 +71,24 @@ minimize the error introduced by the
 (noisy) constraints 
 
 
+## TODO
+
+End goal: .kml file of predicted output & also map with features and path
+
+### Tasks
+
+1. From odometry measurements (IMU file):
+   - Create list of constraints
+   - Generate poses of robot at all time frames
+
+2. Detecting landmarks & their position:
+   - Use SIFT to find features from image
+   - Use stereo to find depth after finding features
+   - Translate into constraints
+
+3. Optimizing the graph:
+   - TODO
+   - Least squares methods?
+   - Compute some kind of inverse matrix?
+
+
