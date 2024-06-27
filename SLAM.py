@@ -1,57 +1,35 @@
-import numpy as np
-from matplotlib import pyplot as plt
+import g2o
 
+from parse import get_dataset
 from graph import Graph
-import pandas as pd
-
-root_node = Graph.Node([0, 0])
-
-graph = Graph(Graph.Node([0, 0]))
+from odom_constraint import add_odom_constraint_edge, to_se2
 
 
-def calculate_odom_measurement(acceleration, delta_t):
-    """
-    We only have the acceleration not the velocity.
-    Uses the formula $x_{i+1} = x_i + 1/2 a*t^2$.
-    :param acceleration: 2D array representing acceleration
-    :param delta_t: t
-    :return:
-    """
-    return 1/2*acceleration*delta_t*delta_t
+def run_slam():
+    odoms, lasers = get_dataset()
+    # odoms: np array of the form:
+    # [[x_1,y_1,theta_1], [x_2,y_2,theta_2], ... ]
+    # lasers: np array of the form:
+    # [A, B, ...] where A,B,.. are each np.arrays of size (180, 2)
+    graph = Graph()
+    assert len(odoms) == len(lasers)
+    initial_pose = g2o.SE2(g2o.Isometry2d(to_se2([0, 0, 0])))
+    prev_id = 0
+    graph.add_vertex(0, initial_pose)
+    for data_id in range(1, len(odoms)-1):
+        successive_odoms = [odoms[prev_id], odoms[data_id]]
+        successive_lasers = [lasers[prev_id], lasers[data_id]]
+        if add_odom_constraint_edge(
+            graph=graph,
+            ids=[prev_id, data_id],
+            odoms=successive_odoms,
+            lasers=successive_lasers,
+            ignore_small_change=True,
+        ):
+            prev_id = data_id
+    print(len(graph.optimizer.vertices().items()))
 
 
-def parse_imu(file_path):
-    # Define the path to your file
-    #file_path = 'path_to_your_file.txt'
-
-    # Read the file into a pandas DataFrame
-    df = pd.read_csv(file_path, delim_whitespace=True)
-
-    # Display the DataFrame
-    print(df)
-    return df
-
-def parse_gps(file_path):
-    df = pd.read_csv(file_path, delim_whitespace=True)
-    print(df)
-    return df
 
 if __name__ == "__main__":
-    imu = parse_imu("data/malaga-urban-dataset-extract-01/malaga-urban-dataset-extract-01_all-sensors_IMU.txt")
-    x_acc, y_acc = np.array(imu["IMU_X_ACC"]), np.array(imu["IMU_Y_ACC"])
-    print(x_acc)
-    acc = np.array(tuple(zip(x_acc, y_acc)))
-    print(acc)
-    x_0 = np.array([0, 0])
-    for a in acc:
-        calculate_odom_measurement(a, 0.01)
-    # df = parse_gps("data/malaga-urban-dataset-extract-01/malaga-urban-dataset-extract-01_all-sensors_GPS.txt")
-    # lat, long = np.array(df["Lat"]), np.array(df["Lon"])
-    # local_x, local_y = np.array(df["Local_X"]), np.array(df["Local_Y"])
-    # plt.plot(long, lat)
-    # plt.show()
-    #
-    # plt.plot(local_x, local_y)
-    # plt.show()
-    # print(lat)
-    # print(long)
+    run_slam()
