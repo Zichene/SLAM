@@ -13,6 +13,7 @@ class Graph:
         solver = g2o.BlockSolverSE2(g2o.LinearSolverEigenSE2())
         solver = g2o.OptimizationAlgorithmLevenberg(solver)
         self.optimizer.set_algorithm(solver)
+        self.ids = []
 
     def optimize(self, max_iterations=20):
         """
@@ -38,6 +39,7 @@ class Graph:
         se2_vertex.set_id(id)
         se2_vertex.set_fixed(fixed)
         self.optimizer.add_vertex(se2_vertex)
+        self.ids.append(id)
 
     def add_edge(self,
                  vertices,
@@ -78,3 +80,10 @@ class Graph:
         """
         assert self.optimizer.vertex(id) is not None
         return self.optimizer.vertex(id).estimate()
+
+    def plot(self):
+        # Plot vertices
+        for id in range(len(self.optimizer.vertices())):
+            x, y = self.optimizer.get_pose(id).to_vector()[:2]
+
+        # Plot edges

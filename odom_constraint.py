@@ -4,7 +4,7 @@ import g2o
 
 def to_se2(odom):
     """
-    Get the SE2 (3x3 matrix) representation of a odometry (or similar format) reading.
+    Get the SE2 (3x3 matrix) representation of an odometry (or similar format) reading.
     :param odom: 2D Odometry reading of the form [x, y, theta]
     :return: np.array 3x3 matrix corresponding to the SE2 form of the odom reading.
     """

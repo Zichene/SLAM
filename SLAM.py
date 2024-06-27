@@ -3,6 +3,7 @@ import g2o
 from parse import get_dataset
 from graph import Graph
 from odom_constraint import add_odom_constraint_edge, to_se2
+from loop_closure import detect_loop_closure
 
 
 def run_slam():
@@ -27,7 +28,17 @@ def run_slam():
             ignore_small_change=True,
         ):
             prev_id = data_id
+            # here check for loop closure
+            detect_loop_closure(graph, data_id)
+
     print(len(graph.optimizer.vertices().items()))
+    print(graph.ids)
+    print(graph.get_pose(graph.ids[20]).to_vector())
+
+    graph.optimize(max_iterations=20)
+    print(len(graph.optimizer.vertices().items()))
+    print(graph.ids)
+    print(graph.get_pose(graph.ids[20]).to_vector())
 
 
 
