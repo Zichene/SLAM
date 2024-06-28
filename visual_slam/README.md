@@ -20,5 +20,22 @@ We will only make use of the stereo sequences (there are no odometry measurement
 
 - Updating and constructing the graph:
 
-- **For** all frame in the dataset:
-  - 
+- **For** all frames in the dataset:
+  - **Compute** relative pose of successive frame:
+    - Use SIFT to find features in both frames and matches
+    - Use RANSAC to find Essential Matrix E
+    - Recover the pose (use opencv.recoverPose())
+  
+  - **If** large enough change is detected:
+    - Add vertices corresponding to the two different frames to the graph
+    - Add the edge connecting them (relative pose)
+    - **Do** loop closure detection:
+      - Put all vertices of Graph in KD-Tree
+      - Query only close poses according to KD-Tree
+        - **For each** 'close' pose:
+          - **Compute** relative pose between close pose and current pose
+          - **If** relative pose (transformation) is good enough:
+            - A loop closure is detected
+            - Add edge to graph using computed relative pose
+            - Add vertex to graph
+            - Optimize graph
