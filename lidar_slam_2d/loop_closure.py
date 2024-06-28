@@ -41,7 +41,7 @@ def detect_loop_closure(graph, id, lasers, robust_kernel=True):
         )
         # if we have a good enough match, loop closure detected
         mean_dist = np.mean(distances)
-        if np.mean(distances) < tolerance and graph.ids[index] != id:
+        if mean_dist < tolerance and graph.ids[index] != id:
             information = np.linalg.inv(cov)
             # add new edge corresponding to loop closure constraint to graph
             graph.add_edge(
