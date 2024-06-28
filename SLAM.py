@@ -12,10 +12,12 @@ def run_slam():
     # [[x_1,y_1,theta_1], [x_2,y_2,theta_2], ... ]
     # lasers: np array of the form:
     # [A, B, ...] where A,B,.. are each np.arrays of size (180, 2)
-    graph = Graph()
     assert len(odoms) == len(lasers)
-    initial_pose = g2o.SE2(g2o.Isometry2d(to_se2([0, 0, 0])))
+
+    graph = Graph()
     prev_id = 0
+    add_odom_edge_index = 0
+    initial_pose = g2o.SE2(g2o.Isometry2d(to_se2([0, 0, 0])))
     graph.add_vertex(0, initial_pose)
     for data_id in range(1, len(odoms)-1):
         successive_odoms = [odoms[prev_id], odoms[data_id]]
@@ -28,18 +30,16 @@ def run_slam():
             ignore_small_change=True,
         ):
             prev_id = data_id
-            # here check for loop closure
-            detect_loop_closure(graph, data_id)
+            # here check for loop closure every ten iterations
+            if add_odom_edge_index % 10 == 0:
+                if detect_loop_closure(graph, data_id, lasers):
+                    print(f"Loop closure detected at index {data_id}. Optimizing graph ... ")
+                    graph.optimize()
+                    print("Graph optimized.")
+            add_odom_edge_index += 1
 
     print(len(graph.optimizer.vertices().items()))
-    print(graph.ids)
-    print(graph.get_pose(graph.ids[20]).to_vector())
-
-    graph.optimize(max_iterations=20)
-    print(len(graph.optimizer.vertices().items()))
-    print(graph.ids)
-    print(graph.get_pose(graph.ids[20]).to_vector())
-
+    print(len(graph.optimizer.edges()))
 
 
 if __name__ == "__main__":
