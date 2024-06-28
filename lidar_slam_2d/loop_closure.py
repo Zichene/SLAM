@@ -21,24 +21,28 @@ def detect_loop_closure(graph, id, lasers, robust_kernel=True):
     """
     tolerance = 0.15
     kd_closest_threshold = 4.25
-    graph.get_pose(0).to_vector()
+    #graph.get_pose(0).to_vector()
     # get the (x,y) for each pose in the graph
     poses = [graph.get_pose(idx).to_vector()[0:2] for idx in graph.ids]
     kdtree = cKDTree(poses)
-    current_pose = graph.get_pose(id).to_vector()[0:2]
+    x, y = graph.get_pose(id).to_vector()[0:2]
     # get poses which are closest to current_pose using kd
-    closest_indices = kdtree.query_ball_point(current_pose, r=kd_closest_threshold)
+    closest_indices = kdtree.query_ball_point(np.array([x, y]), r=kd_closest_threshold)
     # perform laser scan matching on closest indices
     for index in closest_indices:
         laser_set_A = lasers[graph.ids[index]]
         laser_set_B = lasers[id]
-        transformation, distances, num_iter, cov = icp(
-            laser_set_A,
-            laser_set_B,
-            np.eye(3),
-            max_iterations=80,
-            tolerance=0.0001
-        )
+        with np.errstate(all='raise'):
+            try:
+                transformation, distances, num_iter, cov = icp(
+                    laser_set_A,
+                    laser_set_B,
+                    np.eye(3),
+                    max_iterations=100,
+                    tolerance=0.00001
+                )
+            except Exception as e:
+                continue
         # if we have a good enough match, loop closure detected
         mean_dist = np.mean(distances)
         if mean_dist < tolerance and graph.ids[index] != id:

@@ -1,5 +1,6 @@
 import g2o
 import numpy as np
+import matplotlib.pyplot as plt
 
 class Graph:
     """
@@ -66,11 +67,11 @@ class Graph:
                 assert v is not None
             se2_edge.set_vertex(i, v)
 
-            se2_edge.set_measurement(measurement)
-            se2_edge.set_information(information)
-            if robust_kernel is not None:
-                se2_edge.set_robust_kernel(robust_kernel)
-            self.optimizer.add_edge(se2_edge)
+        se2_edge.set_measurement(measurement)
+        se2_edge.set_information(information)
+        if robust_kernel is not None:
+            se2_edge.set_robust_kernel(robust_kernel)
+        self.optimizer.add_edge(se2_edge)
 
     def get_pose(self, id):
         """
@@ -83,7 +84,12 @@ class Graph:
 
     def plot(self):
         # Plot vertices
-        for id in range(len(self.optimizer.vertices())):
-            x, y = self.optimizer.get_pose(id).to_vector()[:2]
+        traj = []
+        for id in self.ids:
+            traj.append(self.get_pose(id).to_vector()[:2])
 
+        traj = np.array(traj)
+        plt.plot(traj[:, 0], traj[:, 1], '-g')
+        #plt.plot(x, y, 'ro')
+        plt.show()
         # Plot edges

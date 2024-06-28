@@ -51,7 +51,7 @@ def get_dataset():
     def polar_to_cartesian(range_readings, angle_increment):
         cartesian_coords = []
         for i, r in enumerate(range_readings):
-            angle = i * angle_increment
+            angle = i * angle_increment # - (np.pi/2)
             x = r * np.cos(angle)
             y = r * np.sin(angle)
             cartesian_coords.append(np.array((x, y)))
@@ -60,6 +60,7 @@ def get_dataset():
     angle_increment = np.pi / 180
 
     # Add new column to flaser_df with Cartesian coordinates
+
     flaser_df['range_cartesian_readings'] = flaser_df['range_readings'].apply(lambda ranges: polar_to_cartesian(ranges, angle_increment))
 
     # Odom

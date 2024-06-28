@@ -185,9 +185,6 @@ def icp(A, B, init_pose=None, max_iterations=20, tolerance=0.001):
         filtered_src = src[:, np.linalg.norm(src[:m, :], axis=0) < 80]
         indices = indices[distances < 1.0]
 
-        if len(indices) == 0:
-            continue
-
         # compute the transformation between
         # the current source and nearest destination points
         T,_,_ = best_fit_transform(filtered_src[:m, distances < 1.0].T, dst[:m,indices].T)
