@@ -9,7 +9,7 @@ class Graph():
         solver = g2o.OptimizationAlgorithmLevenberg(solver)
         self.optimizer.set_algorithm(solver)
 
-    def optimize(self, max_iterations=20):
+    def optimize(self, max_iterations=40):
         """
         Use the g2o optimizer to optimize the graph.
         """
