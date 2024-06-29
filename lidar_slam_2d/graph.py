@@ -15,6 +15,9 @@ class Graph:
         solver = g2o.OptimizationAlgorithmLevenberg(solver)
         self.optimizer.set_algorithm(solver)
         self.ids = []
+        self.loop_detected_ids = []
+        self.loop_detected_ids_corresponding = []
+        self.mean_dists = []
 
     def optimize(self, max_iterations=20):
         """
@@ -36,8 +39,8 @@ class Graph:
         """
         assert isinstance(pose, g2o.SE2)
         se2_vertex = g2o.VertexSE2()
-        se2_vertex.set_estimate(pose)
         se2_vertex.set_id(id)
+        se2_vertex.set_estimate(pose)
         se2_vertex.set_fixed(fixed)
         self.optimizer.add_vertex(se2_vertex)
         self.ids.append(id)
@@ -90,6 +93,14 @@ class Graph:
 
         traj = np.array(traj)
         plt.plot(traj[:, 0], traj[:, 1], '-g')
-        #plt.plot(x, y, 'ro')
+
+        for id in self.loop_detected_ids:
+            x, y = self.get_pose(id).to_vector()[:2]
+            plt.plot(x, y, 'ro')
+
+        i = 0
+        for id in self.loop_detected_ids:
+            print(f"Id {id}, corresponding {self.loop_detected_ids_corresponding[i]}")
+            i += 1
         plt.show()
         # Plot edges

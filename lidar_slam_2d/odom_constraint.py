@@ -39,14 +39,14 @@ def add_odom_constraint_edge(graph, ids, odoms, lasers, current_pose, ignore_sma
 
     # check that a 'significant change has happened'
     diff = odoms[1] - odoms[0]
+    initial_pose = to_se2(diff)
     if ignore_small_change and (np.linalg.norm(diff[0:2]) < distance_small_change_threshold
-                                and diff[2] < angle_small_change_threshold):
+                                and abs(diff[2]) < angle_small_change_threshold):
         return False, current_pose
 
     # scan match lasers using ICP
     laser_set_A = lasers[0]
     laser_set_B = lasers[1]
-    initial_pose = to_se2(diff)
 
     with np.errstate(all='raise'):
         try:
@@ -55,7 +55,7 @@ def add_odom_constraint_edge(graph, ids, odoms, lasers, current_pose, ignore_sma
                 laser_set_A,
                 initial_pose,
                 max_iterations=100,
-                tolerance=0.00001,
+                tolerance=0.0001,
             )
         except Exception as e:
             return False, current_pose

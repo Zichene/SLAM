@@ -39,7 +39,7 @@ def get_dataset():
             })
 
     # Parse
-    with open('data/aces.clf.txt', 'r') as file:
+    with open('data/intel.clf.txt', 'r') as file:
         for line in file:
             if not (line.startswith('#') or line.startswith('PARAM')) and line.strip():
                 parse_line(line.strip())
