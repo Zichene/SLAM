@@ -50,12 +50,12 @@ We can represent our problem using Graphs (nodes connected with edges).
 If: robot moves from x_i to x_i+1 according to odometry
 measurements:
 
-![img_1.png](lidar_slam_2d/readme_imgs/img_1.png)
+![img_1.png](lidar_slam_2d/doc/img_1.png)
 
 If: robot observes the same part
 of the environment from x_i and x_j
 
-![img.png](lidar_slam_2d/readme_imgs/img.png)
+![img.png](lidar_slam_2d/doc/img.png)
 
 
 ### Nodes
