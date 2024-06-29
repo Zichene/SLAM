@@ -3,7 +3,7 @@
 - Base our project on https://github.com/HobbySingh/Graph-SLAM.
 and https://github.com/goktug97/PyGraphSLAM
 
-![img.png](readme_imgs/slam_pipeline.png)
+![img.png](doc/slam_pipeline.png)
 
 ### Dataset
 
@@ -33,7 +33,7 @@ of `g2o` module, specifically the `SparseOptimizer` class.
 - Implement the `Graph` class template below.
 - The SE2 object refers to objects which are in fact 3x3 matrices. See figure below:
 
-![img_1.png](readme_imgs/se2.png)
+![img_1.png](doc/se2.png)
 
 ```python
 import g2o
@@ -104,7 +104,7 @@ into three phases:
   - Get `ODOM` data for the same 'time' frame
   - Store all of the laser and odom data in some arrays
   
-![img.png](readme_imgs/laser_diagram.png)
+![img.png](doc/laser_diagram.png)
 
 #### Constructing and Updating the Graph
 - Only update graph when **significant** robot motion (translation or rotation)
